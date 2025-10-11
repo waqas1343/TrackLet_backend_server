@@ -1,0 +1,23 @@
+databases:
+  - name: tracklet_pro_db
+    databaseName: tracklet_pro
+    user: tracklet_pro_user
+    plan: free
+
+services:
+  - type: web
+    name: tracklet-pro-api
+    env: node
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: MONGO_URI
+        fromDatabase:
+          name: tracklet_pro_db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
