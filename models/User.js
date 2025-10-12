@@ -26,4 +26,10 @@ const userSchema = new mongoose.Schema(
   }
 );
 
+// Add indexes
+userSchema.index({ email: 1 });
+
+// Log when the model is compiled
+console.log('Compiling User model...');
+
 module.exports = mongoose.model('User', userSchema);

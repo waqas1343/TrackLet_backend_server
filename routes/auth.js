@@ -11,6 +11,12 @@ router.post('/register', async (req, res) => {
   const { name, email, password } = req.body;
 
   try {
+    // Check if JWT_SECRET is available
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET is not defined in environment variables');
+      return res.status(500).json({ msg: 'Server configuration error' });
+    }
+
     let user = await User.findOne({ email });
 
     if (user) {
@@ -39,13 +45,16 @@ router.post('/register', async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '5d' },
       (err, token) => {
-        if (err) throw err;
+        if (err) {
+          console.error('JWT signing error:', err);
+          return res.status(500).json({ msg: 'Token generation failed' });
+        }
         res.json({ token });
       }
     );
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+    console.error('Registration error:', err.message);
+    res.status(500).json({ msg: 'Registration failed', error: err.message });
   }
 });
 
@@ -56,6 +65,12 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // Check if JWT_SECRET is available
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET is not defined in environment variables');
+      return res.status(500).json({ msg: 'Server configuration error' });
+    }
+
     let user = await User.findOne({ email });
 
     if (!user) {
@@ -79,13 +94,16 @@ router.post('/login', async (req, res) => {
       process.env.JWT_SECRET,
       { expiresIn: '5d' },
       (err, token) => {
-        if (err) throw err;
+        if (err) {
+          console.error('JWT signing error:', err);
+          return res.status(500).json({ msg: 'Token generation failed' });
+        }
         res.json({ token });
       }
     );
   } catch (err) {
-    console.error(err.message);
-    res.status(500).send('Server error');
+    console.error('Login error:', err.message);
+    res.status(500).json({ msg: 'Login failed', error: err.message });
   }
 });
 
