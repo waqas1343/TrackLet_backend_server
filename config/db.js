@@ -9,6 +9,11 @@ const connectDB = async () => {
     
     console.log('Attempting to connect to MongoDB...');
     
+    // Log the connection string (mask sensitive info in production)
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('MongoDB URI:', process.env.MONGO_URI);
+    }
+    
     // Use the MONGO_URI environment variable
     const conn = await mongoose.connect(process.env.MONGO_URI, {
       useNewUrlParser: true,
@@ -30,6 +35,7 @@ const connectDB = async () => {
     return conn;
   } catch (error) {
     console.error(`Database connection error: ${error.message}`);
+    console.error(`Error stack: ${error.stack}`);
     // Don't exit the process in production, let the application handle it
     if (process.env.NODE_ENV !== 'production') {
       process.exit(1);

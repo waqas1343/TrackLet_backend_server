@@ -14,11 +14,13 @@ app.use(cors());
 app.use(express.json());
 
 // Log environment variables for debugging (remove in production)
-console.log('Environment variables:');
-console.log('- NODE_ENV:', process.env.NODE_ENV);
-console.log('- PORT:', process.env.PORT);
-console.log('- MONGO_URI:', process.env.MONGO_URI ? '*** EXISTS ***' : 'MISSING');
-console.log('- JWT_SECRET:', process.env.JWT_SECRET ? '*** EXISTS ***' : 'MISSING');
+if (process.env.NODE_ENV !== 'production') {
+  console.log('Environment variables:');
+  console.log('- NODE_ENV:', process.env.NODE_ENV);
+  console.log('- PORT:', process.env.PORT);
+  console.log('- MONGO_URI:', process.env.MONGO_URI ? '*** EXISTS ***' : 'MISSING');
+  console.log('- JWT_SECRET:', process.env.JWT_SECRET ? '*** EXISTS ***' : 'MISSING');
+}
 
 // Database connection with error handling
 let dbConnected = false;
@@ -69,13 +71,16 @@ if (process.env.NODE_ENV === 'production') {
 
 // Error handling middleware with detailed logging
 app.use((err, req, res, next) => {
-  console.error('Unhandled error:', err.stack);
+  console.error('=== UNHANDLED ERROR ===');
+  console.error('Error message:', err.message);
+  console.error('Error stack:', err.stack);
   console.error('Request details:', {
     method: req.method,
     url: req.url,
     headers: req.headers,
     body: req.body
   });
+  console.error('========================');
   
   // Send detailed error in development, generic message in production
   if (process.env.NODE_ENV === 'production') {
@@ -98,7 +103,11 @@ const server = app.listen(PORT, () => {
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (err, promise) => {
-  console.log('Unhandled Rejection at:', promise, 'reason:', err.message);
+  console.log('=== UNHANDLED PROMISE REJECTION ===');
+  console.log('Reason:', err.message);
+  console.log('Promise:', promise);
+  console.log('====================================');
+  
   // Close server & exit process in development, but not in production
   if (process.env.NODE_ENV !== 'production') {
     server.close(() => process.exit(1));
