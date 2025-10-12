@@ -13,11 +13,31 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Database connection
-connectDB();
+// Database connection with error handling
+let dbConnected = false;
+connectDB()
+  .then(() => {
+    dbConnected = true;
+  })
+  .catch((err) => {
+    console.error('Failed to connect to database:', err.message);
+    // In production, we might want to continue running the server for health checks
+    if (process.env.NODE_ENV === 'production') {
+      dbConnected = false;
+    }
+  });
 
 // Define routes
 app.use('/api/auth', authRoutes);
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'OK', 
+    timestamp: new Date().toISOString(),
+    database: dbConnected ? 'Connected' : 'Disconnected'
+  });
+});
 
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
@@ -40,6 +60,7 @@ app.use((err, req, res, next) => {
   res.status(500).send('Something broke!');
 });
 
+// Use the PORT environment variable provided by Vercel, or default to 10000
 const PORT = process.env.PORT || 10000;
 
 const server = app.listen(PORT, () => {
@@ -50,5 +71,9 @@ const server = app.listen(PORT, () => {
 process.on('unhandledRejection', (err, promise) => {
   console.log(`Error: ${err.message}`);
   // Close server & exit process
-  server.close(() => process.exit(1));
+  server.close(() => {
+    if (process.env.NODE_ENV !== 'production') {
+      process.exit(1);
+    }
+  });
 });
