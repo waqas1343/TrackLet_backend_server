@@ -14,6 +14,7 @@ const employeeRoutes = require('./routes/employees');
 const tankRoutes = require('./routes/tanks');
 const notificationRoutes = require('./routes/notifications');
 const driverRoutes = require('./routes/drivers');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 
@@ -47,6 +48,7 @@ connectDB()
 
 // Define routes
 app.use('/api/auth', authRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/plants', plantRoutes);
 app.use('/api/profile', profileRoutes);
