@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv').config({ path: __dirname + '/.env' });
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -6,6 +6,14 @@ const connectDB = require('./config/db');
 
 // Routes
 const authRoutes = require('./routes/auth');
+const orderRoutes = require('./routes/orders');
+const plantRoutes = require('./routes/plants');
+const profileRoutes = require('./routes/profile');
+const expenseRoutes = require('./routes/expenses');
+const employeeRoutes = require('./routes/employees');
+const tankRoutes = require('./routes/tanks');
+const notificationRoutes = require('./routes/notifications');
+const driverRoutes = require('./routes/drivers');
 
 const app = express();
 
@@ -39,6 +47,14 @@ connectDB()
 
 // Define routes
 app.use('/api/auth', authRoutes);
+app.use('/api/orders', orderRoutes);
+app.use('/api/plants', plantRoutes);
+app.use('/api/profile', profileRoutes);
+app.use('/api/expenses', expenseRoutes);
+app.use('/api/employees', employeeRoutes);
+app.use('/api/tanks', tankRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/drivers', driverRoutes);
 
 // Health check endpoint
 app.get('/health', (req, res) => {
